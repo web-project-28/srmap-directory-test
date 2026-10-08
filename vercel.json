@@ -1,1 +1,19 @@
-
+{
+  "version": 2,
+  "functions": {
+    "api/directory.js": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/directory",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
+  ]
+}
