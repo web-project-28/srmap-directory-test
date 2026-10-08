@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>SRMAP Directory Test</title>
+  <title>SRMAP Directory</title>
 
   <style>
     * {
@@ -13,50 +12,40 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top, #18233d 0%, #080c16 45%, #05070d 100%);
-      color: #f3f6ff;
+      font-family: Arial, sans-serif;
+      background: #080b12;
+      color: #f4f5f7;
     }
 
-    .container {
+    .app {
       width: min(760px, 100%);
       margin: auto;
-      padding: 24px 16px 50px;
+      padding: 18px;
     }
 
     h1 {
-      margin: 0;
-      font-size: 26px;
-      font-weight: 800;
+      margin: 0 0 5px;
+      font-size: 25px;
     }
 
-    .subtitle {
-      margin-top: 6px;
-      color: #9ca8c0;
+    .sub {
+      color: #9da4b3;
+      margin-bottom: 20px;
       font-size: 14px;
     }
 
-    .card {
-      margin-top: 20px;
-      padding: 18px;
-      border: 1px solid #293650;
+    .panel {
+      background: #111722;
+      border: 1px solid #252d3a;
       border-radius: 18px;
-      background: rgba(14, 21, 37, 0.92);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-    }
-
-    .fields {
-      display: grid;
-      grid-template-columns: 1fr 1.6fr;
-      gap: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
     }
 
     label {
       display: block;
       margin-bottom: 7px;
-      color: #aeb9cf;
+      color: #aeb6c5;
       font-size: 13px;
     }
 
@@ -66,115 +55,108 @@
       width: 100%;
       min-height: 48px;
       border-radius: 12px;
-      border: 1px solid #34415d;
-      background: #090f1d;
+      border: 1px solid #30394a;
+      background: #0b1019;
       color: white;
-      padding: 0 14px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    select:focus,
-    input:focus {
-      border-color: #6875ff;
-      box-shadow: 0 0 0 3px rgba(104, 117, 255, 0.15);
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 12px;
     }
 
     button {
-      margin-top: 13px;
-      background: linear-gradient(135deg, #6674ff, #4957dc);
-      border-color: #7783ff;
-      font-weight: 800;
+      background: #c9952e;
+      color: #111;
+      font-weight: 700;
+      border: none;
       cursor: pointer;
     }
 
     button:disabled {
-      opacity: 0.55;
-      cursor: wait;
+      opacity: .55;
+      cursor: not-allowed;
     }
 
     .status {
-      min-height: 20px;
-      margin-top: 10px;
-      color: #9eabc4;
-      font-size: 13px;
+      color: #aeb6c5;
+      font-size: 14px;
+      margin-top: 8px;
     }
 
     .error {
-      color: #ff9e9e;
+      color: #ff7777;
     }
 
-    .result-card {
-      margin-top: 12px;
-      padding: 15px;
-      border: 1px solid #293650;
-      border-radius: 15px;
-      background: #0a1120;
+    .result {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #28303c;
     }
 
-    .result-name {
+    .result:last-child {
+      border-bottom: none;
+    }
+
+    .photo {
+      width: 105px;
+      height: 125px;
+      flex: 0 0 105px;
+      object-fit: cover;
+      background: #d1d1d1;
+      border-radius: 7px;
+    }
+
+    .info {
+      min-width: 0;
+    }
+
+    .name {
       font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 9px;
-    }
-
-    .result-line {
-      margin: 5px 0;
-      color: #b9c4d9;
-      font-size: 13px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
-
-    .result-line strong {
-      color: #e1e7f5;
-    }
-
-    .badge {
-      display: inline-block;
-      margin-bottom: 10px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: #17233b;
-      color: #b9c4ff;
-      font-size: 11px;
-    }
-
-    .read-more {
-      display: inline-block;
-      margin-top: 8px;
-      color: #9da8ff;
-      text-decoration: none;
-      font-size: 13px;
       font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      margin: 5px 0;
+      line-height: 1.35;
+      color: #c6ccd7;
+    }
+
+    .field strong {
+      color: white;
+    }
+
+    .read {
+      display: inline-block;
+      margin-top: 10px;
+      color: #e3b34c;
+      font-weight: 700;
+      text-decoration: none;
     }
 
     .empty {
-      padding: 25px 10px;
       text-align: center;
-      color: #9ba7be;
-      font-size: 14px;
+      padding: 25px 10px;
+      color: #aeb6c5;
     }
 
-    .debug {
-      margin-top: 15px;
-      max-height: 280px;
-      overflow: auto;
-      padding: 12px;
-      border-radius: 10px;
-      background: #050914;
-      color: #8995ad;
-      font: 11px/1.5 monospace;
-      white-space: pre-wrap;
-    }
-
-    @media (max-width: 560px) {
-      .fields {
-        grid-template-columns: 1fr;
+    @media (max-width: 520px) {
+      .result {
+        gap: 10px;
       }
 
-      h1 {
-        font-size: 23px;
+      .photo {
+        width: 90px;
+        height: 110px;
+        flex-basis: 90px;
+      }
+
+      .name {
+        font-size: 15px;
+      }
+
+      .field {
+        font-size: 13px;
       }
     }
   </style>
@@ -182,394 +164,261 @@
 
 <body>
 
-  <main class="container">
+<div class="app">
 
-    <h1>SRMAP Directory Test</h1>
+  <h1>SRMAP Directory</h1>
+  <div class="sub">
+    Search live Student, Faculty and Staff records from SRM University-AP.
+  </div>
 
-    <div class="subtitle">
-      Live Student, Faculty and Staff directory search
+  <div class="panel">
+
+    <label for="directoryType">Directory</label>
+
+    <select id="directoryType">
+      <option value="student">Student Directory</option>
+      <option value="faculty">Faculty Directory</option>
+      <option value="staff">Staff Directory</option>
+    </select>
+
+    <label for="department">Department</label>
+
+    <select id="department">
+      <option value="">Loading departments...</option>
+    </select>
+
+    <label for="search">Name</label>
+
+    <input
+      id="search"
+      type="text"
+      placeholder="Enter name"
+      autocomplete="off"
+    >
+
+    <button id="searchBtn">
+      Search Live Directory
+    </button>
+
+    <div id="status" class="status"></div>
+
+  </div>
+
+  <div id="results" class="panel">
+    <div class="empty">
+      Select a department and search for a person.
     </div>
+  </div>
 
-    <section class="card">
+</div>
 
-      <div class="fields">
+<script>
+  const API_BASE =
+    "https://YOUR-VERCEL-PROJECT.vercel.app/api/directory";
 
-        <div>
-          <label for="directoryType">
-            Directory
-          </label>
+  const directoryType = document.getElementById("directoryType");
+  const department = document.getElementById("department");
+  const search = document.getElementById("search");
+  const searchBtn = document.getElementById("searchBtn");
+  const statusBox = document.getElementById("status");
+  const resultsBox = document.getElementById("results");
 
-          <select id="directoryType">
-            <option value="student">
-              Student Directory
-            </option>
+  async function loadDepartments() {
+    department.innerHTML =
+      '<option value="">Loading departments...</option>';
 
-            <option value="faculty">
-              Faculty Directory
-            </option>
+    statusBox.textContent = "Loading live departments...";
 
-            <option value="staff">
-              Staff Directory
-            </option>
-          </select>
-        </div>
+    try {
+      const res = await fetch(
+        `${API_BASE}?action=departments&type=${encodeURIComponent(directoryType.value)}`
+      );
 
-        <div>
-          <label for="searchInput">
-            Search
-          </label>
+      const data = await res.json();
 
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Enter name, ID or email"
-            autocomplete="off"
-          >
-        </div>
+      if (!res.ok || data.error) {
+        throw new Error(data.error || `HTTP ${res.status}`);
+      }
 
-      </div>
+      department.innerHTML =
+        '<option value="">Select Department</option>';
 
-      <button id="searchButton">
-        Search Live Directory
-      </button>
+      for (const item of data.departments || []) {
+        const option = document.createElement("option");
 
-      <div id="status" class="status"></div>
+        option.value = item.value;
+        option.textContent = item.label;
 
-    </section>
+        department.appendChild(option);
+      }
 
-    <section
-      id="results"
-      class="card"
-      style="display:none;"
-    ></section>
+      statusBox.textContent =
+        `${data.departments?.length || 0} live departments loaded.`;
 
-  </main>
+    } catch (err) {
 
+      department.innerHTML =
+        '<option value="">Unable to load departments</option>';
 
-  <script>
+      statusBox.innerHTML =
+        `<span class="error">Failed to fetch: ${escapeHtml(err.message)}</span>`;
+    }
+  }
 
-    /*
-      IMPORTANT:
-      Replace this with your actual Vercel deployment URL.
+  async function searchDirectory() {
 
-      Example:
-      https://your-project.vercel.app/api/directory
-    */
+    const type = directoryType.value;
+    const dept = department.value;
+    const q = search.value.trim();
 
-    const API_BASE =
-      "https://YOUR-VERCEL-PROJECT.vercel.app/api/directory";
-
-
-    const directoryType =
-      document.getElementById("directoryType");
-
-    const searchInput =
-      document.getElementById("searchInput");
-
-    const searchButton =
-      document.getElementById("searchButton");
-
-    const status =
-      document.getElementById("status");
-
-    const results =
-      document.getElementById("results");
-
-
-    function escapeHTML(value) {
-
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
+    if (!dept) {
+      statusBox.innerHTML =
+        '<span class="error">Select a department first.</span>';
+      return;
     }
 
-
-    function showResults(data) {
-
-      results.style.display = "block";
-
-
-      if (
-        !data.results ||
-        data.results.length === 0
-      ) {
-
-        results.innerHTML = `
-          <div class="empty">
-            No matching live records were returned.
-          </div>
-
-          ${
-            data.debug
-              ? `
-                <div class="debug">
-                  ${escapeHTML(
-                    JSON.stringify(
-                      data.debug,
-                      null,
-                      2
-                    )
-                  )}
-                </div>
-              `
-              : ""
-          }
-        `;
-
-        return;
-      }
-
-
-      let html = `
-
-        <div class="badge">
-          ${escapeHTML(data.directory)}
-          •
-          ${data.results.length}
-          result(s)
-        </div>
-
-      `;
-
-
-      data.results.forEach(person => {
-
-        html += `
-
-          <article class="result-card">
-
-            <div class="result-name">
-              ${escapeHTML(
-                person.name || "Unknown"
-              )}
-            </div>
-
-            ${
-              person.department
-                ? `
-                  <div class="result-line">
-                    <strong>Department:</strong>
-                    ${escapeHTML(
-                      person.department
-                    )}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              person.email
-                ? `
-                  <div class="result-line">
-                    <strong>Email:</strong>
-                    ${escapeHTML(
-                      person.email
-                    )}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              person.designation
-                ? `
-                  <div class="result-line">
-                    <strong>Designation:</strong>
-                    ${escapeHTML(
-                      person.designation
-                    )}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              person.phone
-                ? `
-                  <div class="result-line">
-                    <strong>Phone:</strong>
-                    ${escapeHTML(
-                      person.phone
-                    )}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              person.profileUrl
-                ? `
-                  <a
-                    class="read-more"
-                    href="${escapeHTML(
-                      person.profileUrl
-                    )}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Read More →
-                  </a>
-                `
-                : ""
-            }
-
-          </article>
-
-        `;
-
-      });
-
-
-      if (data.debug) {
-
-        html += `
-
-          <div class="debug">
-            ${escapeHTML(
-              JSON.stringify(
-                data.debug,
-                null,
-                2
-              )
-            )}
-          </div>
-
-        `;
-
-      }
-
-
-      results.innerHTML = html;
-
+    if (!q) {
+      statusBox.innerHTML =
+        '<span class="error">Enter a name to search.</span>';
+      return;
     }
 
+    searchBtn.disabled = true;
+    searchBtn.textContent = "Searching...";
+    resultsBox.innerHTML =
+      '<div class="empty">Searching SRM Intranet...</div>';
+    statusBox.textContent = "";
 
-    async function searchDirectory() {
+    try {
 
-      const query =
-        searchInput.value.trim();
+      const url =
+        `${API_BASE}?action=search` +
+        `&type=${encodeURIComponent(type)}` +
+        `&department=${encodeURIComponent(dept)}` +
+        `&q=${encodeURIComponent(q)}`;
 
+      const res = await fetch(url);
+      const data = await res.json();
 
-      if (query.length < 2) {
-
-        status.innerHTML =
-          '<span class="error">Enter at least 2 characters.</span>';
-
-        searchInput.focus();
-
-        return;
-
+      if (!res.ok || data.error) {
+        throw new Error(data.error || `HTTP ${res.status}`);
       }
 
+      renderResults(data.results || []);
 
-      searchButton.disabled = true;
+      statusBox.textContent =
+        `${data.results?.length || 0} result(s) found.`;
 
-      results.style.display = "none";
+    } catch (err) {
 
-      status.textContent =
-        "Searching the live SRM Intranet...";
+      resultsBox.innerHTML =
+        `<div class="empty error">
+          Failed to fetch<br><br>
+          ${escapeHtml(err.message)}
+        </div>`;
 
-
-      try {
-
-        const url =
-          new URL(API_BASE);
-
-
-        url.searchParams.set(
-          "type",
-          directoryType.value
-        );
-
-
-        url.searchParams.set(
-          "q",
-          query
-        );
-
-
-        const response =
-          await fetch(url.toString());
-
-
-        const data =
-          await response.json();
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            data.error ||
-            `HTTP ${response.status}`
-          );
-
-        }
-
-
-        status.textContent =
-          `Live search completed • ${
-            data.results?.length || 0
-          } result(s)`;
-
-
-        showResults(data);
-
-      }
-
-      catch (error) {
-
-        status.innerHTML = `
-
-          <span class="error">
-            ${escapeHTML(error.message)}
-          </span>
-
-        `;
-
-
-        results.style.display = "block";
-
-        results.innerHTML = `
-
-          <div class="empty error">
-            Backend/search request failed.
-          </div>
-
-        `;
-
-      }
-
-      finally {
-
-        searchButton.disabled = false;
-
-      }
-
+      statusBox.textContent = "";
     }
 
+    searchBtn.disabled = false;
+    searchBtn.textContent = "Search Live Directory";
+  }
 
-    searchButton.addEventListener(
-      "click",
-      searchDirectory
-    );
+  function renderResults(items) {
 
+    if (!items.length) {
+      resultsBox.innerHTML =
+        '<div class="empty">No matching records found.</div>';
+      return;
+    }
 
-    searchInput.addEventListener(
-      "keydown",
-      event => {
+    resultsBox.innerHTML = "";
 
-        if (event.key === "Enter") {
-          searchDirectory();
-        }
+    for (const person of items) {
 
+      const row = document.createElement("div");
+      row.className = "result";
+
+      const photo = document.createElement("img");
+      photo.className = "photo";
+      photo.src = person.photo || "";
+      photo.alt = person.name || "Profile photo";
+
+      photo.onerror = () => {
+        photo.style.display = "none";
+      };
+
+      const info = document.createElement("div");
+      info.className = "info";
+
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = person.name || "Unknown";
+
+      info.appendChild(name);
+
+      addField(info, "Department", person.department);
+      addField(info, "Branch", person.branch);
+      addField(info, "Designation", person.designation);
+      addField(info, "Email", person.email);
+      addField(info, "Phone", person.phone);
+
+      if (person.profileUrl) {
+        const link = document.createElement("a");
+
+        link.className = "read";
+        link.href = person.profileUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Read More";
+
+        info.appendChild(link);
       }
-    );
 
-  </script>
+      row.appendChild(photo);
+      row.appendChild(info);
+
+      resultsBox.appendChild(row);
+    }
+  }
+
+  function addField(parent, label, value) {
+
+    if (!value) return;
+
+    const div = document.createElement("div");
+    div.className = "field";
+
+    const strong = document.createElement("strong");
+    strong.textContent = label + ": ";
+
+    div.appendChild(strong);
+    div.appendChild(document.createTextNode(value));
+
+    parent.appendChild(div);
+  }
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  directoryType.addEventListener("change", loadDepartments);
+  searchBtn.addEventListener("click", searchDirectory);
+
+  search.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      searchDirectory();
+    }
+  });
+
+  loadDepartments();
+</script>
 
 </body>
 </html>
