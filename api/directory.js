@@ -11,7 +11,7 @@ const UA =
   "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 " +
   "(KHTML, like Gecko) Chrome/153.0.0.0 Mobile Safari/537.36";
 
-function fetchPage(url) {
+function request(url) {
   return new Promise((resolve, reject) => {
     const u = new URL(url);
 
@@ -42,7 +42,8 @@ function fetchPage(url) {
           resolve({
             status: res.statusCode || 0,
             headers: res.headers,
-            body
+            body,
+            url
           });
         });
       }
@@ -53,6 +54,49 @@ function fetchPage(url) {
   });
 }
 
+async function fetchWithRedirects(startUrl) {
+  let currentUrl = startUrl;
+  const redirects = [];
+
+  for (let i = 0; i < 8; i++) {
+    const response = await request(currentUrl);
+
+    const location = response.headers.location || "";
+
+    if (
+      response.status >= 300 &&
+      response.status < 400 &&
+      location
+    ) {
+      const nextUrl = new URL(
+        location,
+        currentUrl
+      ).href;
+
+      redirects.push({
+        status: response.status,
+        from: currentUrl,
+        location,
+        to: nextUrl
+      });
+
+      currentUrl = nextUrl;
+      continue;
+    }
+
+    return {
+      ...response,
+      finalUrl: currentUrl,
+      redirects
+    };
+  }
+
+  throw new Error(
+    "Too many redirects: " +
+    redirects.length
+  );
+}
+
 function clean(value) {
   return String(value || "")
     .replace(/\s+/g, " ")
@@ -60,11 +104,14 @@ function clean(value) {
 }
 
 async function inspect(type) {
-  const url = TARGETS[type];
+  const originalUrl = TARGETS[type];
 
-  const response = await fetchPage(url);
+  const response =
+    await fetchWithRedirects(originalUrl);
 
-  const $ = cheerio.load(response.body);
+  const $ = cheerio.load(
+    response.body || ""
+  );
 
   const forms = [];
 
@@ -77,11 +124,16 @@ async function inspect(type) {
       const $input = $(input);
 
       inputs.push({
-        type: $input.attr("type") || "text",
-        name: $input.attr("name") || "",
-        id: $input.attr("id") || "",
-        value: $input.attr("value") || "",
-        placeholder: $input.attr("placeholder") || ""
+        type:
+          $input.attr("type") || "text",
+        name:
+          $input.attr("name") || "",
+        id:
+          $input.attr("id") || "",
+        value:
+          $input.attr("value") || "",
+        placeholder:
+          $input.attr("placeholder") || ""
       });
     });
 
@@ -97,43 +149,63 @@ async function inspect(type) {
 
         options.push({
           text: clean($option.text()),
-          value: $option.attr("value") || "",
-          selected: $option.is(":selected")
+          value:
+            $option.attr("value") || "",
+          selected:
+            $option.is(":selected")
         });
       });
 
       selects.push({
-        name: $select.attr("name") || "",
-        id: $select.attr("id") || "",
-        class: $select.attr("class") || "",
+        name:
+          $select.attr("name") || "",
+        id:
+          $select.attr("id") || "",
+        class:
+          $select.attr("class") || "",
         options
       });
     });
 
     const buttons = [];
 
-    $form.find("button, input[type='submit']").each((_, button) => {
-      const $button = $(button);
+    $form
+      .find("button, input[type='submit']")
+      .each((_, button) => {
+        const $button = $(button);
 
-      buttons.push({
-        tag: button.name,
-        type: $button.attr("type") || "",
-        name: $button.attr("name") || "",
-        value: $button.attr("value") || "",
-        text: clean($button.text())
+        buttons.push({
+          type:
+            $button.attr("type") || "",
+          name:
+            $button.attr("name") || "",
+          value:
+            $button.attr("value") || "",
+          text: clean($button.text())
+        });
       });
-    });
 
     forms.push({
       index,
-      action: $form.attr("action") || "",
-      method: ($form.attr("method") || "GET").toUpperCase(),
-      id: $form.attr("id") || "",
-      class: $form.attr("class") || "",
+      action:
+        $form.attr("action") || "",
+      method:
+        (
+          $form.attr("method") ||
+          "GET"
+        ).toUpperCase(),
+      id:
+        $form.attr("id") || "",
+      class:
+        $form.attr("class") || "",
       inputs,
       selects,
       buttons,
-      text: clean($form.text()).slice(0, 3000)
+      text:
+        clean($form.text()).slice(
+          0,
+          5000
+        )
     });
   });
 
@@ -141,7 +213,6 @@ async function inspect(type) {
 
   $("script").each((_, script) => {
     const $script = $(script);
-
     const src = $script.attr("src");
 
     if (src) {
@@ -150,7 +221,8 @@ async function inspect(type) {
         src
       });
     } else {
-      const text = $script.html() || "";
+      const text =
+        $script.html() || "";
 
       if (
         /ajax|fetch|xmlhttprequest|admin-ajax|directory|search/i.test(
@@ -159,7 +231,8 @@ async function inspect(type) {
       ) {
         scripts.push({
           type: "inline",
-          content: text.slice(0, 8000)
+          content:
+            text.slice(0, 10000)
         });
       }
     }
@@ -167,54 +240,99 @@ async function inspect(type) {
 
   const relevantHtml = [];
 
-  $("select, input, button, form").each((_, element) => {
-    relevantHtml.push($.html(element));
-  });
+  $("form, select, input, button").each(
+    (_, element) => {
+      relevantHtml.push(
+        $.html(element)
+      );
+    }
+  );
 
   return {
-    requestedUrl: url,
-    httpStatus: response.status,
-    contentType: response.headers["content-type"] || "",
-    pageTitle: clean($("title").text()),
+    requestedUrl: originalUrl,
+
+    finalUrl:
+      response.finalUrl,
+
+    redirects:
+      response.redirects,
+
+    httpStatus:
+      response.status,
+
+    contentType:
+      response.headers["content-type"] ||
+      "",
+
+    location:
+      response.headers.location ||
+      "",
+
+    pageTitle:
+      clean($("title").text()),
 
     forms,
 
     scripts,
 
-    relevantHtml: relevantHtml.slice(0, 200),
+    relevantHtml:
+      relevantHtml.slice(0, 300),
 
-    bodyText: clean($("body").text()).slice(0, 10000),
+    bodyText:
+      clean($("body").text()).slice(
+        0,
+        15000
+      ),
 
-    htmlStart: response.body.slice(0, 30000)
+    htmlStart:
+      response.body.slice(
+        0,
+        40000
+      )
   };
 }
 
-module.exports = async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Cache-Control", "no-store");
+module.exports = async function handler(
+  req,
+  res
+) {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "*"
+  );
+
+  res.setHeader(
+    "Cache-Control",
+    "no-store"
+  );
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
   try {
-    const action = req.query.action || "";
-    const type = req.query.type || "student";
+    const action =
+      req.query.action || "";
+
+    const type =
+      req.query.type || "student";
 
     if (!TARGETS[type]) {
       return res.status(400).json({
-        error: "Invalid type. Use student, faculty or staff."
+        error:
+          "Invalid type. Use student, faculty or staff."
       });
     }
 
     if (action !== "inspect") {
       return res.status(400).json({
         error:
-          "Inspector is active. Use ?action=inspect&type=student"
+          "Inspector active. Use ?action=inspect&type=student"
       });
     }
 
-    const data = await inspect(type);
+    const data =
+      await inspect(type);
 
     return res.status(200).json(data);
 
@@ -222,8 +340,9 @@ module.exports = async function handler(req, res) {
     console.error(error);
 
     return res.status(500).json({
-      error: error.message || "Inspection failed",
-      stack: error.stack || ""
+      error:
+        error.message ||
+        "Inspection failed"
     });
   }
 };
